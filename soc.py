@@ -1,4 +1,6 @@
 from datetime import datetime
+import database
+SEVERITY_ORDER = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
 
 def parse_line(line):
     parts = line.split()
@@ -31,7 +33,6 @@ def load_events(path):
 def print_summary(events):
     total_events = len(events)
     failed_counts = 0
-    failures_byIP = {}
     targeted_users = []
     failure_times = {}
 
@@ -39,18 +40,18 @@ def print_summary(events):
         if entry["event"] == "FAILED_LOGIN":
             ip = entry["ip"]
             failed_counts += 1
-            failures_byIP[ip] = failures_byIP.get(ip, 0) + 1
             if entry["user"] not in targeted_users:
                 targeted_users.append(entry["user"])
             if ip not in failure_times:
                 failure_times[ip] = []
             failure_times[ip].append(entry["timestamp"])
+
     print("=== LOG SUMMARY ===")
     print(f"Total Events:  {total_events}")
     print(f"Failed Logins:  {failed_counts}")
     print("Failures by IP:")
 
-    for ip in sorted(failures_byIP, key=failures_byIP.get, reverse=True):
+    for ip in sorted(failure_times, key=lambda ip: len(failure_times[ip]), reverse=True):
         stamps = failure_times[ip]
         earliest = min(stamps).strftime("%H:%M:%S")
         latest = max(stamps).strftime("%H:%M:%S")
@@ -58,7 +59,7 @@ def print_summary(events):
             when = earliest
         else:
             when = f"{earliest} -> {latest}"
-        print(f"  {ip:<15}{failures_byIP[ip]}  ({when})")
+        print(f"  {ip:<15}{len(stamps)}  ({when})")
 
     print(f"Targeted users:   {', '.join(targeted_users)}")
 
@@ -82,7 +83,7 @@ def detect_brute_force(events):
                     "rule": "Brute force",
                     "severity": "HIGH",
                     "ip": ip,
-                    "message": f"5 failed logins within {int(window)} seconds"
+                    "message": f"5 failures in {int(window)} seconds"
                 })
                 break
     return alerts
@@ -106,7 +107,7 @@ def detect_username_spraying(events):
                 "rule": "Username spraying",
                 "severity": "HIGH",
                 "ip": ip,
-                "message": f"{len(users)} different usernames targeted: {', '.join(users)}"
+                "message": f"tried {len(users)} usernames"
             })
     return alerts
 
@@ -119,7 +120,7 @@ def detect_off_hours_logins(events):
                 "rule": "Off-hours login",
                 "severity": "MEDIUM",
                 "ip": entry["ip"],
-                "message": f"Successful login by {entry['user']} at {entry['timestamp'].strftime('%H:%M:%S')}" 
+                "message": f"login at {entry['timestamp'].strftime('%H:%M:%S')}" 
             })
     return alerts
 
@@ -138,10 +139,10 @@ def detect_compromise(events):
                 recent_failures += 1
         if recent_failures >= 3:
             alerts.append({
-                "rule": "Possible compromise",
+                "rule": "Compromise",
                 "severity": "CRITICAL",
                 "ip": entry["ip"],
-                "message": f"Successful login by {entry['user']} at {entry['timestamp'].strftime('%H:%M:%S')} after {recent_failures} failures in the previous 2 minutes"
+                "message": f"Successful after {recent_failures} failures"
             })
     return alerts
 
@@ -152,8 +153,8 @@ def detect_malformed_logs(malformed):
     return [{
         "rule": "Malformed logs",
         "severity": "LOW",
-        "ip": "N/A",
-        "message": f"{malformed} log line(s) could not be parsed and were skipped"
+        "ip": "—",
+        "message": f"{malformed} line skipped" if malformed == 1 else f"{malformed} lines skipped"
     }]
 
 
@@ -167,21 +168,28 @@ def run_rules(events, malformed):
     return alerts
 
 
+def sort_alerts(alerts):
+    return sorted(alerts, key=lambda alert: SEVERITY_ORDER[alert["severity"]])
+
+
 def print_alerts(alerts):
     print()
-    print("=== ALERTS ===")
+    print(f"=== ALERTS ({len(alerts)}) ===")
     if len(alerts) == 0:
         print("No alerts.")
         return
-    for level in ["CRITICAL", "HIGH", "MEDIUM", "LOW"]:
-        for alert in alerts:
-            if alert["severity"] == level:
-                print(f"[{alert['severity']}] {alert['rule']} - {alert['ip']}")
-                print(f"    {alert['message']}")
+    for alert in sort_alerts(alerts):
+        tag = f"[{alert['severity']}]"
+        print(f"{tag:<11}{alert['rule']:<18}{alert['ip']:<14}{alert['message']}")
 
 
+def main():
+    conn = database.init_db("soc.db")
+    
+    events, malformed = load_events("logs/sample.log")
+    print_summary(events)
+    alerts = run_rules(events, malformed)
+    print_alerts(alerts)
 
-events, malformed = load_events("logs/sample.log")
-print_summary(events)
-alerts = run_rules(events, malformed)
-print_alerts(alerts)
+    conn.close()
+main()
