@@ -1,4 +1,5 @@
 from datetime import datetime
+import os
 import database
 SEVERITY_ORDER = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
 
@@ -185,11 +186,27 @@ def print_alerts(alerts):
 
 def main():
     conn = database.init_db("soc.db")
-    
-    events, malformed = load_events("logs/sample.log")
-    print_summary(events)
-    alerts = run_rules(events, malformed)
-    print_alerts(alerts)
+    log_path = "logs/sample.log"
+
+    malformed = 0
+    if os.path.exists(log_path):
+        file_events, malformed = load_events(log_path)
+        saved = database.save_events(conn, file_events)
+        print(f"Saved {saved} new events to database ({len(file_events)} read from log)")
+    else:
+        print(f"{log_path} not found - using events already in the database")
+
+    db_events = database.load_events_from_db(conn)
+    print(f"Loaded {len(db_events)} events from database")
+
+    print_summary(db_events)
+    alerts = run_rules(db_events, malformed)
+    saved_alerts = database.save_alerts(conn, alerts)
+    print(f"Saved {saved_alerts} new alerts to database")
+
+    print_alerts(database.load_alerts_from_db(conn))
 
     conn.close()
+
 main()
+
