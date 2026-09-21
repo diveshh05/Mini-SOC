@@ -35,9 +35,9 @@ def save_events(conn, events):
     for event in events:
         rows.append((
             event["timestamp"].strftime("%Y-%m-%d %H:%M:%S"),
-            event["event"],
-            event["user"],
-            event["ip"],
+            event["event_type"],
+            event["username"],
+            event["source_ip"],
         ))
 
     cursor = conn.executemany(
@@ -55,7 +55,7 @@ def save_alerts(conn, alerts):
         rows.append((
             alert["rule"],
             alert["severity"],
-            alert["ip"],
+            alert["source_ip"],
             alert["message"],
             detected_at,
         ))
@@ -76,9 +76,9 @@ def load_events_from_db(conn):
     for timestamp, event_type, username, source_ip in rows:
         events.append({
             "timestamp": datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S"),
-            "event": event_type,
-            "user": username,
-            "ip": source_ip,
+            "event_type": event_type,
+            "username": username,
+            "source_ip": source_ip,
         })
     return events
 
@@ -92,11 +92,8 @@ def load_alerts_from_db(conn):
         alerts.append({
             "rule": rule,
             "severity": severity,
-            "ip": source_ip,
+            "source_ip": source_ip,
             "message": message,
             "detected_at": datetime.strptime(detected_at, "%Y-%m-%d %H:%M:%S"),
         })
     return alerts
-
-
-
