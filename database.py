@@ -23,7 +23,7 @@ def init_db(path):
             source_ip TEXT,
             message TEXT NOT NULL,
             detected_at TEXT NOT NULL,
-            UNIQUE (rule, severity, source_ip, message)
+            UNIQUE (rule, source_ip)
         )
     """)
 
@@ -61,9 +61,13 @@ def save_alerts(conn, alerts):
         ))
 
     cursor = conn.executemany(
-        "INSERT OR IGNORE INTO alerts (rule, severity, source_ip, message, detected_at) VALUES (?, ?, ?, ?, ?)",
+        "INSERT INTO alerts (rule, severity, source_ip, message, detected_at) VALUES (?, ?, ?, ?, ?) "
+        "ON CONFLICT (rule, source_ip) DO UPDATE SET "
+        "severity = excluded.severity, message = excluded.message "
+        "WHERE message != excluded.message OR severity != excluded.severity",
         rows,
     )
+
     conn.commit()
     return cursor.rowcount
 
@@ -97,3 +101,53 @@ def load_alerts_from_db(conn):
             "detected_at": datetime.strptime(detected_at, "%Y-%m-%d %H:%M:%S"),
         })
     return alerts
+
+def count_events(conn):
+    row = conn.execute("SELECT COUNT(*) FROM events").fetchone()
+    return row[0]
+
+def count_alerts(conn):
+    row = conn.execute("SELECT COUNT(*) FROM alerts").fetchone()
+    return row[0]
+
+def count_critical_alerts(conn):
+    row = conn.execute(
+        "SELECT COUNT(*) FROM alerts WHERE severity = ?",
+        ("CRITICAL",),
+    ).fetchone()
+    return row[0]
+
+def get_recent_alerts(conn):
+    rows = conn.execute(
+        "SELECT rule, severity, source_ip, message, detected_at "
+        "FROM alerts ORDER BY id DESC LIMIT 10"
+    ).fetchall()
+
+    alerts = []
+    for rule, severity, source_ip, message, detected_at in rows:
+        alerts.append({
+            "rule": rule,
+            "severity": severity,
+            "source_ip": source_ip,
+            "message": message,
+            "detected_at": detected_at
+        })
+    return alerts
+
+def get_top_ips(conn):
+    rows = conn.execute(
+        "SELECT source_ip, COUNT(*) FROM events "
+        "WHERE event_type = ? "
+        "GROUP BY source_ip "
+        "ORDER BY COUNT(*) DESC, source_ip "
+        "LIMIT 5",
+        ("FAILED_LOGIN",),
+    ).fetchall()
+
+    top_ips = []
+    for source_ip, count in rows:
+        top_ips.append({
+            "source_ip": source_ip,
+            "count": count,
+        })
+    return top_ips

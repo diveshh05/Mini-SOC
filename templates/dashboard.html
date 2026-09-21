@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MINI SOC — Security Monitoring Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+
+</head>
+<body>
+  <main class="page">
+
+    <!-- 1. Header -->
+    <header class="header">
+      <div class="header-left">
+        <span class="logo">MINI SOC</span>
+        <div class="live-indicator" aria-label="Snapshot">
+          <span class="live-dot" aria-hidden="true"></span>
+          <span class="live-label">Snapshot</span>
+        </div>
+      </div>
+      <span class="last-updated">Last updated 2026-09-21 14:32:10</span>
+    </header>
+
+    <!-- 2. Stat Cards -->
+    <section aria-label="Summary statistics">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Events</div>
+          <div class="stat-number">12</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Alerts</div>
+          <div class="stat-number">5</div>
+        </div>
+        <div class="stat-card critical" aria-label="Critical alerts: 1">
+          <div class="stat-label">Critical</div>
+          <div class="stat-number">1</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Recent Alerts -->
+    <section aria-label="Recent alerts">
+      <h2 class="section-heading">Recent Alerts</h2>
+      <div class="alert-list" role="list">
+
+        <article class="alert critical" role="listitem" aria-label="Critical alert: SSH Brute Force">
+          <div class="alert-row-1">
+            <div class="alert-left">
+              <span class="badge">Critical</span>
+              <span class="rule-name">SSH Brute Force</span>
+            </div>
+            <time class="alert-time" datetime="2026-09-21T14:32:07">14:32:07</time>
+          </div>
+          <div class="alert-row-2">192.168.1.15</div>
+          <div class="alert-row-3">5 failed SSH logins for root in 60s</div>
+        </article>
+
+        <article class="alert high" role="listitem" aria-label="High alert: Port Scan Detected">
+          <div class="alert-row-1">
+            <div class="alert-left">
+              <span class="badge">High</span>
+              <span class="rule-name">Port Scan Detected</span>
+            </div>
+            <time class="alert-time" datetime="2026-09-21T14:29:51">14:29:51</time>
+          </div>
+          <div class="alert-row-2">10.0.0.23</div>
+          <div class="alert-row-3">Connections to 18 ports in 10s</div>
+        </article>
+
+        <article class="alert high" role="listitem" aria-label="High alert: Root Login Attempt">
+          <div class="alert-row-1">
+            <div class="alert-left">
+              <span class="badge">High</span>
+              <span class="rule-name">Root Login Attempt</span>
+            </div>
+            <time class="alert-time" datetime="2026-09-21T14:27:14">14:27:14</time>
+          </div>
+          <div class="alert-row-2">192.168.1.15</div>
+          <div class="alert-row-3">Direct SSH login attempt as root</div>
+        </article>
+
+        <article class="alert medium" role="listitem" aria-label="Medium alert: Failed Login Spike">
+          <div class="alert-row-1">
+            <div class="alert-left">
+              <span class="badge">Medium</span>
+              <span class="rule-name">Failed Login Spike</span>
+            </div>
+            <time class="alert-time" datetime="2026-09-21T14:21:40">14:21:40</time>
+          </div>
+          <div class="alert-row-2">10.0.0.23</div>
+          <div class="alert-row-3">3 failed logins in 5 minutes</div>
+        </article>
+
+        <article class="alert low" role="listitem" aria-label="Low alert: New Source IP">
+          <div class="alert-row-1">
+            <div class="alert-left">
+              <span class="badge">Low</span>
+              <span class="rule-name">New Source IP</span>
+            </div>
+            <time class="alert-time" datetime="2026-09-21T14:18:03">14:18:03</time>
+          </div>
+          <div class="alert-row-2">192.168.1.42</div>
+          <div class="alert-row-3">First-seen IP connected on port 22</div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- 4. Top Source IPs -->
+    <section aria-label="Top source IP addresses">
+      <h2 class="section-heading">Top Source IPs</h2>
+      <div class="ip-list">
+
+        <div class="ip-row">
+          <span class="ip-address">192.168.1.15</span>
+          <div class="ip-bar-track" role="img" aria-label="5 events, 100%">
+            <div class="ip-bar-fill" style="width: 100%;"></div>
+          </div>
+          <span class="ip-count">5</span>
+        </div>
+
+        <div class="ip-row">
+          <span class="ip-address">10.0.0.23</span>
+          <div class="ip-bar-track" role="img" aria-label="3 events, 60%">
+            <div class="ip-bar-fill" style="width: 60%;"></div>
+          </div>
+          <span class="ip-count">3</span>
+        </div>
+
+        <div class="ip-row">
+          <span class="ip-address">192.168.1.42</span>
+          <div class="ip-bar-track" role="img" aria-label="1 event, 20%">
+            <div class="ip-bar-fill" style="width: 20%;"></div>
+          </div>
+          <span class="ip-count">1</span>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>
