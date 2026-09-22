@@ -22,7 +22,7 @@
           <span class="live-label">Snapshot</span>
         </div>
       </div>
-      <span class="last-updated">Last updated 2026-09-21 14:32:10</span>
+      <span class="last-updated">Last updated {{ last_updated }} </span>
     </header>
 
     <!-- 2. Stat Cards -->
@@ -30,15 +30,15 @@
       <div class="stat-grid">
         <div class="stat-card">
           <div class="stat-label">Total Events</div>
-          <div class="stat-number">12</div>
+          <div class="stat-number">{{ total_events }}</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Total Alerts</div>
-          <div class="stat-number">5</div>
+          <div class="stat-number">{{ total_alerts }}</div>
         </div>
-        <div class="stat-card critical" aria-label="Critical alerts: 1">
+        <div class="stat-card critical" aria-label="Critical alerts: {{ critical_alerts }}">
           <div class="stat-label">Critical</div>
-          <div class="stat-number">1</div>
+          <div class="stat-number">{{ critical_alerts }}</div>
         </div>
       </div>
     </section>
