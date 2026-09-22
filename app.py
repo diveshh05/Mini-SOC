@@ -18,6 +18,7 @@ def home():
         total_events = database.count_events(conn)
         total_alerts = database.count_alerts(conn)
         critical_alerts = database.count_critical_alerts(conn)
+        recent_alerts = database.get_recent_alerts(conn)
     finally:
         conn.close()
 
@@ -28,5 +29,6 @@ def home():
         total_events=total_events,
         total_alerts=total_alerts,
         critical_alerts=critical_alerts,
+        recent_alerts=recent_alerts,
         last_updated=last_updated,
     )

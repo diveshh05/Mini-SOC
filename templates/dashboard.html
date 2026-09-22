@@ -47,67 +47,21 @@
     <section aria-label="Recent alerts">
       <h2 class="section-heading">Recent Alerts</h2>
       <div class="alert-list" role="list">
-
-        <article class="alert critical" role="listitem" aria-label="Critical alert: SSH Brute Force">
+        {% for alert in recent_alerts %}
+        <article class="alert {{ alert.severity|lower }}" role="listitem" aria-label="{{ alert.severity|lower }} alert: {{ alert.rule }}">
           <div class="alert-row-1">
             <div class="alert-left">
-              <span class="badge">Critical</span>
-              <span class="rule-name">SSH Brute Force</span>
+              <span class="badge">{{ alert.severity }}</span>
+              <span class="rule-name">{{ alert.rule }}</span>
             </div>
-            <time class="alert-time" datetime="2026-09-21T14:32:07">14:32:07</time>
+            <time class="alert-time" datetime="{{ alert.detected_at }}">{{ alert.detected_at }}</time>
           </div>
-          <div class="alert-row-2">192.168.1.15</div>
-          <div class="alert-row-3">5 failed SSH logins for root in 60s</div>
+          <div class="alert-row-2">{{ alert.source_ip }}</div>
+          <div class="alert-row-3">{{ alert.message }}</div>
         </article>
-
-        <article class="alert high" role="listitem" aria-label="High alert: Port Scan Detected">
-          <div class="alert-row-1">
-            <div class="alert-left">
-              <span class="badge">High</span>
-              <span class="rule-name">Port Scan Detected</span>
-            </div>
-            <time class="alert-time" datetime="2026-09-21T14:29:51">14:29:51</time>
-          </div>
-          <div class="alert-row-2">10.0.0.23</div>
-          <div class="alert-row-3">Connections to 18 ports in 10s</div>
-        </article>
-
-        <article class="alert high" role="listitem" aria-label="High alert: Root Login Attempt">
-          <div class="alert-row-1">
-            <div class="alert-left">
-              <span class="badge">High</span>
-              <span class="rule-name">Root Login Attempt</span>
-            </div>
-            <time class="alert-time" datetime="2026-09-21T14:27:14">14:27:14</time>
-          </div>
-          <div class="alert-row-2">192.168.1.15</div>
-          <div class="alert-row-3">Direct SSH login attempt as root</div>
-        </article>
-
-        <article class="alert medium" role="listitem" aria-label="Medium alert: Failed Login Spike">
-          <div class="alert-row-1">
-            <div class="alert-left">
-              <span class="badge">Medium</span>
-              <span class="rule-name">Failed Login Spike</span>
-            </div>
-            <time class="alert-time" datetime="2026-09-21T14:21:40">14:21:40</time>
-          </div>
-          <div class="alert-row-2">10.0.0.23</div>
-          <div class="alert-row-3">3 failed logins in 5 minutes</div>
-        </article>
-
-        <article class="alert low" role="listitem" aria-label="Low alert: New Source IP">
-          <div class="alert-row-1">
-            <div class="alert-left">
-              <span class="badge">Low</span>
-              <span class="rule-name">New Source IP</span>
-            </div>
-            <time class="alert-time" datetime="2026-09-21T14:18:03">14:18:03</time>
-          </div>
-          <div class="alert-row-2">192.168.1.42</div>
-          <div class="alert-row-3">First-seen IP connected on port 22</div>
-        </article>
-
+        {% else %}
+        <p class="alert-row-3">No alerts yet.</p>
+        {% endfor %}
       </div>
     </section>
 
