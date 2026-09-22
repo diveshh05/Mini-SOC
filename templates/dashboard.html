@@ -69,31 +69,19 @@
     <section aria-label="Top source IP addresses">
       <h2 class="section-heading">Top Source IPs</h2>
       <div class="ip-list">
+        {% for ip in top_ips %}
 
         <div class="ip-row">
-          <span class="ip-address">192.168.1.15</span>
-          <div class="ip-bar-track" role="img" aria-label="5 events, 100%">
-            <div class="ip-bar-fill" style="width: 100%;"></div>
+          <span class="ip-address">{{ ip.source_ip }}</span>
+          <div class="ip-bar-track" role="img" aria-label="{{ ip.count }} failed logins, {{ ip.percent }}%">
+            <div class="ip-bar-fill" style="width: {{ ip.percent }}%;"></div>
           </div>
-          <span class="ip-count">5</span>
+          <span class="ip-count">{{ ip.count }}</span>
         </div>
-
-        <div class="ip-row">
-          <span class="ip-address">10.0.0.23</span>
-          <div class="ip-bar-track" role="img" aria-label="3 events, 60%">
-            <div class="ip-bar-fill" style="width: 60%;"></div>
-          </div>
-          <span class="ip-count">3</span>
-        </div>
-
-        <div class="ip-row">
-          <span class="ip-address">192.168.1.42</span>
-          <div class="ip-bar-track" role="img" aria-label="1 event, 20%">
-            <div class="ip-bar-fill" style="width: 20%;"></div>
-          </div>
-          <span class="ip-count">1</span>
-        </div>
-
+        {% else %}
+        <p class="alert-row-3">No failed logins yet.</p>
+        {% endfor %}
+        
       </div>
     </section>
 

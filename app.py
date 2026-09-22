@@ -19,9 +19,13 @@ def home():
         total_alerts = database.count_alerts(conn)
         critical_alerts = database.count_critical_alerts(conn)
         recent_alerts = database.get_recent_alerts(conn)
+        top_ips = database.get_top_ips(conn)
     finally:
         conn.close()
-
+        if top_ips:
+            top_count = top_ips[0]["count"]
+            for ip in top_ips:
+                ip["percent"] = round(ip["count"] / top_count * 100)
     last_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     return render_template(
@@ -31,4 +35,5 @@ def home():
         critical_alerts=critical_alerts,
         recent_alerts=recent_alerts,
         last_updated=last_updated,
+        top_ips=top_ips,                                      
     )
