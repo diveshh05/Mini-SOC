@@ -46,14 +46,13 @@ Log format, one event per line:
 
 ## Design decisions
 
-- **No duplicate alerts:** Alerts are now unique by rule and source_ip. When the same alert fires again, the existing alert is updated instead of creating a duplicate. This is the upsert strategy described in your project.
+- **No duplicate alerts:** Alerts are unique by rule and source IP. When the same alert fires again with new details (for example "tried 4 usernames" becoming "tried 5"), the existing row is updated with an upsert instead of a duplicate being created.
 - **One database connection per request:** Each Flask request runs in its own thread, so the database connection should be opened inside the request, used, and then closed to avoid SQLite thread errors.
 - **Dumb template:** The bar percentage is calculated in Python so the HTML template only displays the result and does not contain the calculation/business logic; SQL is used to get the data, while Python prepares it for the template.
 
 ## Security
 
-- **Stored XSS test:** I added a log entry containing <script>alert(1)</script> as the username, ran soc.py, and loaded the dashboard. The script was displayed as harmless text instead of executing a popup because Jinja autoescapes HTML by default, converting < into safe text and preventing the stored XSS attack.
-- The dashboard runs on `127.0.0.1` only, with debug mode off.
+- **Stored XSS test:** I added log entries with `<script>alert(1)</script>` in the source IP field, ran `soc.py`, and loaded the dashboard. The payload was shown as plain text in Top Source IPs and no popup appeared, because Jinja autoescapes every `{{ }}` value (turning `<` into `&lt;`). I never use the `|safe` filter on log data.
 
 ## Future improvements
 
