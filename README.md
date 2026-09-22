@@ -35,7 +35,7 @@ venv\Scripts\activate          # Linux/Mac: source venv/bin/activate
 pip install -r requirements.txt
 
 python soc.py                  # ingest logs and detect
-flask --app app run            # open http://127.0.0.1:5000
+flask --app app run            
 ```
 
 Log format, one event per line:
