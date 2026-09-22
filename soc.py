@@ -126,8 +126,9 @@ def detect_off_hours_logins(events):
             alerts.append({
                 "rule": "Off-hours login",
                 "severity": "MEDIUM",
-                "source_ip": entry["source_ip"],            # CHANGED key (both)
-                "message": f"login at {entry['timestamp'].strftime('%H:%M:%S')}"
+                "source_ip": entry["source_ip"],            
+                "message": f"login at {entry['timestamp'].strftime('%Y-%m-%d %H:%M:%S')}"
+
             })
     return alerts
 

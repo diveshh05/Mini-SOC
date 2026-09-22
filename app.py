@@ -22,10 +22,10 @@ def home():
         top_ips = database.get_top_ips(conn)
     finally:
         conn.close()
-        if top_ips:
-            top_count = top_ips[0]["count"]
-            for ip in top_ips:
-                ip["percent"] = round(ip["count"] / top_count * 100)
+    if top_ips:
+        top_count = top_ips[0]["count"]
+        for ip in top_ips:
+            ip["percent"] = round(ip["count"] / top_count * 100)
     last_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     return render_template(

@@ -54,7 +54,7 @@
               <span class="badge">{{ alert.severity }}</span>
               <span class="rule-name">{{ alert.rule }}</span>
             </div>
-            <time class="alert-time" datetime="{{ alert.detected_at }}">{{ alert.detected_at }}</time>
+              <time class="alert-time" datetime="{{ alert.detected_at }}">Detected {{ alert.detected_at }}</time>
           </div>
           <div class="alert-row-2">{{ alert.source_ip }}</div>
           <div class="alert-row-3">{{ alert.message }}</div>
